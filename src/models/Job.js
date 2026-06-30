@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-const User = require('./User');
 
 const Job = sequelize.define('Job', {
   id: {
@@ -11,42 +10,30 @@ const Job = sequelize.define('Job', {
   employerId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: {
-      model: User,
-      key: 'id',
-    },
-    onDelete: 'CASCADE',
+    field: 'employer_id',
   },
   title: {
     type: DataTypes.STRING(150),
     allowNull: false,
-    validate: {
-      notEmpty: true,
-      len: [5, 150],
-    },
   },
   description: {
     type: DataTypes.TEXT,
     allowNull: false,
-    validate: {
-      notEmpty: true,
-      len: [20, 5000],
-    },
   },
   companyName: {
     type: DataTypes.STRING(100),
     allowNull: false,
+    field: 'company_name',
   },
   jobType: {
     type: DataTypes.STRING(50),
     defaultValue: 'Full-time',
-    validate: {
-      isIn: [['Full-time', 'Part-time', 'Remote', 'Contract', 'Freelance', 'Internship', 'Temporary']],
-    },
+    field: 'job_type',
   },
   salaryRange: {
     type: DataTypes.STRING(50),
     allowNull: true,
+    field: 'salary_range',
   },
   latitude: {
     type: DataTypes.DECIMAL(9, 6),
@@ -60,75 +47,65 @@ const Job = sequelize.define('Job', {
     type: DataTypes.JSONB,
     defaultValue: [],
     allowNull: true,
-    comment: 'Array of multiple-choice questions for screening',
+    field: 'assessment_questions',
   },
   requiredSkills: {
     type: DataTypes.ARRAY(DataTypes.STRING),
     defaultValue: [],
     allowNull: true,
+    field: 'required_skills',
   },
   requiredExperience: {
     type: DataTypes.INTEGER,
     allowNull: true,
-    comment: 'Minimum years of experience required',
+    field: 'required_experience',
   },
   educationLevel: {
     type: DataTypes.STRING(50),
     allowNull: true,
+    field: 'education_level',
   },
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
+    field: 'is_active',
   },
   applicationDeadline: {
     type: DataTypes.DATE,
     allowNull: true,
+    field: 'application_deadline',
   },
   vacanciesCount: {
     type: DataTypes.INTEGER,
     defaultValue: 1,
+    field: 'vacancies_count',
   },
   viewsCount: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
+    field: 'views_count',
   },
   applicationsCount: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
+    field: 'applications_count',
   },
   isFeatured: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
+    field: 'is_featured',
   },
   expiresAt: {
     type: DataTypes.DATE,
     allowNull: true,
+    field: 'expires_at',
   },
 }, {
   tableName: 'jobs',
-  indexes: [
-    {
-      fields: ['latitude', 'longitude'],
-      using: 'gist',
-      name: 'idx_jobs_location_gist',
-    },
-    {
-      fields: ['requiredSkills'],
-      using: 'gin',
-      name: 'idx_jobs_skills_gin',
-    },
-    {
-      fields: ['isActive', 'expiresAt'],
-      name: 'idx_jobs_active_expires',
-    },
-  ],
+  timestamps: true,
+  underscored: true,
 });
 
-// Associations
-Job.belongsTo(User, { foreignKey: 'employerId', as: 'employer' });
-User.hasMany(Job, { foreignKey: 'employerId', as: 'jobs' });
-
-// Instance methods
 Job.prototype.incrementViews = async function() {
   this.viewsCount += 1;
   return await this.save();

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boss Jobs Ethiopia</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#0066cc,#004499);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+        .container{background:#fff;border-radius:16px;padding:40px;max-width:800px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+        h1{color:#0066cc;font-size:2.2em;margin-bottom:5px}
+        .subtitle{color:#666;margin-bottom:20px}
+        .status{background:#e8f5e9;padding:12px 24px;border-radius:8px;display:inline-block;margin-bottom:25px}
+        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:25px}
+        .stat-card{background:#f8f9fa;padding:20px;border-radius:10px;text-align:center;border-left:4px solid #0066cc}
+        .stat-num{font-size:2em;font-weight:bold;color:#0066cc}
+        .stat-label{color:#666;font-size:.85em}
+        h3{margin:20px 0 15px;padding-bottom:10px;border-bottom:2px solid #e0e0e0}
+        .endpoints{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:25px}
+        .ep{background:#f8f9fa;padding:10px 15px;border-radius:8px;display:flex;align-items:center;gap:10px;font-size:.9em}
+        .method{padding:4px 8px;border-radius:4px;font-weight:bold;font-size:.75em;color:#fff;min-width:45px;text-align:center}
+        .get{background:#1976d2}.post{background:#388e3c}
+        .path{font-family:monospace;font-size:.85em}
+        .accounts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:25px}
+        .acc{background:#fff3e0;padding:15px;border-radius:8px;border-left:4px solid #f57c00}
+        .acc-role{font-weight:bold;color:#f57c00;margin-bottom:5px}
+        .acc-email{font-family:monospace;font-size:.85em}.acc-pass{font-family:monospace;font-size:.8em;color:#666}
+        .links{text-align:center;margin-top:20px}
+        .btn{display:inline-block;background:#0066cc;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;margin:5px}
+        .btn:hover{background:#004499}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🇪🇹 Boss Jobs Ethiopia</h1>
+        <p class="subtitle">Professional Job Portal Platform</p>
+        <div class="status">🟢 <strong>System Running</strong> - v2.0.0</div>
+        
+        <h3>📊 Platform Stats</h3>
+        <div class="stats">
+            <div class="stat-card"><div class="stat-num" id="jobs">-</div><div class="stat-label">Active Jobs</div></div>
+            <div class="stat-card"><div class="stat-num" id="users">-</div><div class="stat-label">Users</div></div>
+            <div class="stat-card"><div class="stat-num" id="apps">-</div><div class="stat-label">Applications</div></div>
+            <div class="stat-card"><div class="stat-num">24/7</div><div class="stat-label">Uptime</div></div>
+        </div>
+
+        <h3>📡 Core API Endpoints</h3>
+        <div class="endpoints">
+            <div class="ep"><span class="method post">POST</span><span class="path">/api/v1/auth/register</span></div>
+            <div class="ep"><span class="method post">POST</span><span class="path">/api/v1/auth/login</span></div>
+            <div class="ep"><span class="method get">GET</span><span class="path">/api/v1/jobs</span></div>
+            <div class="ep"><span class="method get">GET</span><span class="path">/api/v1/jobs/nearby</span></div>
+            <div class="ep"><span class="method get">GET</span><span class="path">/api/v1/jobs/search?q=dev</span></div>
+            <div class="ep"><span class="method post">POST</span><span class="path">/api/v1/jobs</span></div>
+            <div class="ep"><span class="method post">POST</span><span class="path">/api/v1/applications/apply/1</span></div>
+            <div class="ep"><span class="method get">GET</span><span class="path">/api/v1/profile</span></div>
+            <div class="ep"><span class="method get">GET</span><span class="path">/api/v1/dashboard/seeker</span></div>
+            <div class="ep"><span class="method get">GET</span><span class="path">/api/v1/dashboard/employer</span></div>
+        </div>
+
+        <h3>👤 Test Accounts</h3>
+        <div class="accounts">
+            <div class="acc"><div class="acc-role">🔧 Admin</div><div class="acc-email">admin@bossjobs.et</div><div class="acc-pass">Admin123!@#</div></div>
+            <div class="acc"><div class="acc-role">🏢 Employer</div><div class="acc-email">hr@ethiotech.com</div><div class="acc-pass">Employer123!@#</div></div>
+            <div class="acc"><div class="acc-role">👤 Seeker</div><div class="acc-email">abebe@email.com</div><div class="acc-pass">Seeker123!@#</div></div>
+        </div>
+
+        <div class="links">
+            <a href="/api/v1" class="btn">📚 API Docs</a>
+            <a href="/health" class="btn">❤️ Health</a>
+            <a href="/api/v1/jobs" class="btn">💼 View Jobs</a>
+        </div>
+    </div>
+
+    <script>
+        async function loadStats(){
+            try{
+                const r=await fetch('/api/v1/jobs');
+                const d=await r.json();
+                document.getElementById('jobs').textContent=d.data?.length||d.count||0;
+                
+                const l=await fetch('/api/v1/auth/login',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({emailOrPhone:'admin@bossjobs.et',password:'Admin123!@#'})
+                });
+                const ld=await l.json();
+                if(ld.data?.token){
+                    const s=await fetch('/api/v1/dashboard/platform',{
+                        headers:{'Authorization':'Bearer '+ld.data.token}
+                    });
+                    const sd=await s.json();
+                    if(sd.data?.statistics){
+                        document.getElementById('users').textContent=sd.data.statistics.totalUsers||0;
+                        document.getElementById('apps').textContent=sd.data.statistics.totalApplications||0;
+                    }
+                }
+            }catch(e){}
+        }
+        loadStats();
+    </script>
+</body>
+</html>

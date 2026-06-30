@@ -11,56 +11,57 @@ const User = sequelize.define('User', {
   fullName: {
     type: DataTypes.STRING(100),
     allowNull: false,
-    validate: {
-      notEmpty: true,
-      len: [2, 100],
-    },
+    field: 'full_name',
   },
   email: {
     type: DataTypes.STRING(150),
     unique: true,
     allowNull: true,
-    validate: {
-      isEmail: true,
-    },
   },
   phoneNumber: {
     type: DataTypes.STRING(20),
     unique: true,
     allowNull: false,
-    validate: {
-      notEmpty: true,
-      is: /^\+?[1-9]\d{1,14}$/, // E.164 format
-    },
+    field: 'phone_number',
   },
   passwordHash: {
     type: DataTypes.STRING(255),
     allowNull: false,
+    field: 'password_hash',
   },
   role: {
-    type: DataTypes.ENUM('job_seeker', 'employer', 'admin'),
+    type: DataTypes.STRING(20),
     defaultValue: 'job_seeker',
     allowNull: false,
+    validate: {
+      isIn: [['job_seeker', 'employer', 'admin']],
+    },
   },
   telegramId: {
     type: DataTypes.STRING(50),
     unique: true,
     allowNull: true,
+    field: 'telegram_id',
   },
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
+    field: 'is_active',
   },
   lastLoginAt: {
     type: DataTypes.DATE,
     allowNull: true,
+    field: 'last_login_at',
   },
   profileCompletedAt: {
     type: DataTypes.DATE,
     allowNull: true,
+    field: 'profile_completed_at',
   },
 }, {
   tableName: 'users',
+  timestamps: true,
+  underscored: true,
   hooks: {
     beforeCreate: async (user) => {
       if (user.passwordHash) {
@@ -77,7 +78,6 @@ const User = sequelize.define('User', {
   },
 });
 
-// Instance methods
 User.prototype.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.passwordHash);
 };

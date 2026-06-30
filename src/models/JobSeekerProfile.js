@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-const User = require('./User');
 
 const JobSeekerProfile = sequelize.define('JobSeekerProfile', {
   id: {
@@ -11,28 +10,20 @@ const JobSeekerProfile = sequelize.define('JobSeekerProfile', {
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: {
-      model: User,
-      key: 'id',
-    },
-    onDelete: 'CASCADE',
+    field: 'user_id',
   },
   title: {
     type: DataTypes.STRING(100),
     allowNull: true,
-    comment: 'e.g., Senior Accountant, Driver',
   },
   bio: {
     type: DataTypes.TEXT,
     allowNull: true,
-    validate: {
-      len: [0, 2000],
-    },
   },
   voicePitchUrl: {
     type: DataTypes.STRING(255),
     allowNull: true,
-    comment: 'Cloud link to the 30-second introductory audio',
+    field: 'voice_pitch_url',
   },
   skills: {
     type: DataTypes.ARRAY(DataTypes.STRING),
@@ -43,95 +34,67 @@ const JobSeekerProfile = sequelize.define('JobSeekerProfile', {
     type: DataTypes.JSONB,
     defaultValue: [],
     allowNull: true,
-    comment: 'Stores nested employment history for offline sync flexibility',
+    field: 'experience_json',
   },
   educationJson: {
     type: DataTypes.JSONB,
     defaultValue: [],
     allowNull: true,
-    comment: 'Stores educational history',
+    field: 'education_json',
   },
   latitude: {
     type: DataTypes.DECIMAL(9, 6),
     allowNull: true,
-    validate: {
-      min: -90,
-      max: 90,
-    },
   },
   longitude: {
     type: DataTypes.DECIMAL(9, 6),
     allowNull: true,
-    validate: {
-      min: -180,
-      max: 180,
-    },
   },
   preferredJobTypes: {
     type: DataTypes.ARRAY(DataTypes.STRING),
     defaultValue: ['Full-time'],
     allowNull: true,
+    field: 'preferred_job_types',
   },
   expectedSalaryRange: {
     type: DataTypes.STRING(50),
     allowNull: true,
+    field: 'expected_salary_range',
   },
   availabilityStatus: {
-    type: DataTypes.ENUM('immediate', 'within_2_weeks', 'within_1_month', 'negotiable'),
+    type: DataTypes.STRING(20),
     defaultValue: 'immediate',
+    field: 'availability_status',
   },
   profilePictureUrl: {
     type: DataTypes.STRING(255),
     allowNull: true,
+    field: 'profile_picture_url',
   },
   resumeUrl: {
     type: DataTypes.STRING(255),
     allowNull: true,
+    field: 'resume_url',
   },
   yearsOfExperience: {
     type: DataTypes.INTEGER,
     allowNull: true,
-    validate: {
-      min: 0,
-      max: 50,
-    },
+    field: 'years_of_experience',
   },
   isProfileComplete: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
+    field: 'is_profile_complete',
   },
   isPublic: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
+    field: 'is_public',
   },
 }, {
   tableName: 'job_seeker_profiles',
-  indexes: [
-    {
-      fields: ['latitude', 'longitude'],
-      using: 'gist',
-      name: 'idx_seeker_location_gist',
-    },
-    {
-      fields: ['skills'],
-      using: 'gin',
-      name: 'idx_seeker_skills_gin',
-    },
-    {
-      fields: ['userId'],
-      unique: true,
-      name: 'idx_seeker_user_unique',
-    },
-  ],
+  timestamps: true,
+  underscored: true,
 });
-
-// Associations
-JobSeekerProfile.belongsTo(User, { foreignKey: 'userId', as: 'user' });
-User.hasOne(JobSeekerProfile, { foreignKey: 'userId', as: 'profile' });
-
-// Instance methods
-JobSeekerProfile.prototype.isProfileCompleted = function() {
-  return !!(this.title && this.bio && this.skills.length > 0 && this.experienceJson.length > 0);
-};
 
 module.exports = JobSeekerProfile;

@@ -1,7 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-const Job = require('./Job');
-const User = require('./User');
 
 const Application = sequelize.define('Application', {
   id: {
@@ -12,73 +10,56 @@ const Application = sequelize.define('Application', {
   jobId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: {
-      model: Job,
-      key: 'id',
-    },
-    onDelete: 'CASCADE',
+    field: 'job_id',
   },
   seekerId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: {
-      model: User,
-      key: 'id',
-    },
-    onDelete: 'CASCADE',
+    field: 'seeker_id',
   },
   status: {
-    type: DataTypes.ENUM('pending', 'reviewed', 'shortlisted', 'rejected', 'withdrawn'),
+    type: DataTypes.STRING(20),
     defaultValue: 'pending',
+    allowNull: false,
+    validate: {
+      isIn: [['pending', 'reviewed', 'shortlisted', 'rejected', 'withdrawn']],
+    },
   },
   quizScore: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
-    comment: 'Automated grading result from screening quiz',
+    field: 'quiz_score',
   },
   quizAnswers: {
     type: DataTypes.JSONB,
     defaultValue: [],
     allowNull: true,
+    field: 'quiz_answers',
   },
   coverLetter: {
     type: DataTypes.TEXT,
     allowNull: true,
-    validate: {
-      len: [0, 3000],
-    },
+    field: 'cover_letter',
   },
   employerNotes: {
     type: DataTypes.TEXT,
     allowNull: true,
+    field: 'employer_notes',
   },
   appliedAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
+    field: 'applied_at',
   },
   reviewedAt: {
     type: DataTypes.DATE,
     allowNull: true,
+    field: 'reviewed_at',
   },
 }, {
   tableName: 'applications',
-  indexes: [
-    {
-      fields: ['jobId', 'seekerId'],
-      unique: true,
-      name: 'idx_unique_application',
-    },
-    {
-      fields: ['status'],
-      name: 'idx_application_status',
-    },
-  ],
+  timestamps: true,
+  underscored: true,
 });
-
-// Associations
-Application.belongsTo(Job, { foreignKey: 'jobId', as: 'job' });
-Application.belongsTo(User, { foreignKey: 'seekerId', as: 'seeker' });
-Job.hasMany(Application, { foreignKey: 'jobId', as: 'applications' });
-User.hasMany(Application, { foreignKey: 'seekerId', as: 'applications' });
 
 module.exports = Application;
